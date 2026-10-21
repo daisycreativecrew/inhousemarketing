@@ -1,0 +1,35 @@
+import { test, expect } from '@playwright/test'
+import { existsSync, readFileSync } from 'node:fs'
+import sharp from 'sharp'
+test('admin edits, publishes, previews and uploads actual media', async ({ page }) => {
+  test.skip(!existsSync('.data/qa-cms.json'), 'Run npm run test:cms to provision isolated temporary users.')
+  const fixture=JSON.parse(readFileSync('.data/qa-cms.json','utf8'))
+  await page.goto('/admin/login')
+  await page.locator('input[name=email]').fill(fixture.email)
+  await page.locator('input[name=password]').fill(fixture.password)
+  await page.locator('button[type=submit]').click()
+  await page.waitForURL('**/admin')
+  await page.goto(`/admin/collections/pages/${fixture.page}`)
+  await page.locator('#field-title').fill('QA — az adminból szerkesztett cím')
+  await page.getByRole('button',{name:'Publish changes',exact:true}).click()
+  await expect.poll(async () => (await (await page.request.get(`/api/pages/${fixture.page}`)).json()).title).toBe('QA — az adminból szerkesztett cím')
+  await page.goto(`/api/preview?path=${encodeURIComponent(fixture.path)}`)
+  await expect(page.locator('h1')).toHaveText('QA — az adminból szerkesztett cím')
+  await page.goto('/admin/collections/media/create')
+  const buffer=await sharp({create:{width:32,height:32,channels:3,background:'#C6FF00'}}).png().toBuffer()
+  await page.locator('input[type=file]').setInputFiles({name:'qa-test-media.png',mimeType:'image/png',buffer})
+  await page.locator('#field-alt').fill('Automatizált tesztkép; nem ügyfélmédia.')
+  await page.locator('#field-source').fill('Automatizált QA fixture.')
+  await page.getByRole('button',{name:'Save',exact:true}).click()
+  await expect(page).toHaveURL(/\/admin\/collections\/media\/\d+/)
+  const mediaID=page.url().split('/').pop()
+  // Validate the saved media through its actual admin form; unauthenticated REST
+  // deliberately hides pending assets. Cleanup removes this fixture afterwards.
+  await expect(page.locator('#field-alt')).toHaveValue('Automatizált tesztkép; nem ügyfélmédia.')
+  await page.reload()
+  await expect(page.locator('#field-alt')).toHaveValue('Automatizált tesztkép; nem ügyfélmédia.')
+  expect(mediaID).toMatch(/^\d+$/)
+  const saved=await page.request.get(`/api/media/${mediaID}`,{headers:{Origin:new URL(page.url()).origin}})
+  expect(saved.status()).toBe(200)
+  expect((await saved.json()).alt).toContain('Automatizált tesztkép')
+})

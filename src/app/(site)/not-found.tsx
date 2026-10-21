@@ -1,0 +1,2 @@
+import Link from 'next/link'
+export default function NotFound() { return <section className="section container error-page"><p className="eyebrow">404 / ÚJRATERVEZÉS</p><h1>Ez az út most nem vezet tovább.</h1><p>A főoldalról vagy a Self-Auditból megtalálhatjátok a következő lépést.</p><Link className="button" href="/">Vissza a főoldalra →</Link><Link className="button button-secondary" href="/self-audit/">Self-Audit →</Link></section> }

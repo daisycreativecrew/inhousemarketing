@@ -1,0 +1,18 @@
+{
+  "name": "IN/HOUSE — privát tesztverzió",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "forwardPorts": [
+    3000
+  ],
+  "portsAttributes": {
+    "3000": {
+      "label": "IN/HOUSE weboldal és admin",
+      "onAutoForward": "openBrowser",
+      "protocol": "http"
+    }
+  },
+  "postCreateCommand": "npm ci --include=dev && npm run setup:local && npm run seed && npm run build",
+  "postStartCommand": "npm run preview:serve",
+  "waitFor": "postCreateCommand",
+  "remoteUser": "node"
+}
