@@ -1,5 +1,24 @@
 # QA-jegyzék — 2026. október 21.
 
+## Codespaces indítási javítás — 2026. október 22.
+
+Reprodukció: Node 22.23.4/npm 10.9.9 alatt az eredeti zárolófájlhoz futtatott `npm ci --include=dev` `EUSAGE` hibával megállt. Hiányoztak az opcionális peer-függőségek bejegyzései: a Vitest alatti esbuild 0.28.2, platformcsomagjai és yaml 2.9.1. Ez az npm 11-gyel korábban elvégzett ellenőrzésben nem jelentkezett.
+
+A javított zárolófájl 28 hiányzó csomagbejegyzést rögzít. Nem változott meglévő csomag verziója vagy a package.json; nem változott a devcontainer felhasználója, a jóváhagyási logika vagy az éles domain.
+
+Az új ellenőrzés eredményei:
+
+| Ellenőrzés | Eredmény |
+| --- | --- |
+| Node 22.23.4/npm 10.9.9 tiszta telepítés | `npm ci --include=dev` sikeres; ellenőrzött integritású csomagok |
+| Ugyanezen runtime setup → seed → build | Sikeres; meglévő helyi konfiguráció és tartalom megmaradt |
+| Node 22 unit / lint / typecheck | 26 teszt sikeres, lint és typecheck sikeres |
+| Node 22 production szerver | Főoldal, TrustPhone, Self-Audit és admin HTTP 200 |
+| Node 22 első-admin böngészős teszt | 1 sikeres; hitelesített admin létrejött, majd a tesztfiók törölve; 0 megmaradt felhasználó |
+| Node 24.19/npm 11.9 zárolófájl-validáció | `npm ci --dry-run --include=dev` sikeres; nem új tényleges telepítés |
+
+A Node 22 futtatókörnyezet a hivatalos nodejs.org disztribúcióból, az ott közölt SHA-256 ellenőrzése után futott. A teljes Codespaces-konténer indítása továbbra sem volt elérhető innen. A felhasználó képernyőképén helyreállítási mód és `/home/node` hibák látszanak; az eredeti creation.log vége még nem áll rendelkezésre, ezért az ottani kiváltó okkal való azonosság nincs igazolva. A reprodukált telepítési hiba javítása és a napló bekérése ettől függetlenül szükséges.
+
 ## Kiegészítő ellenőrzés a megnyitható átadáshoz
 
 - Új production build, lint és typecheck: sikeres.

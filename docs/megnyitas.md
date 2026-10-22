@@ -20,6 +20,31 @@ npm run preview:serve
 
 A parancs kiírja az adott környezet valódi weboldal- és admincímét. Nem indít második szervert, ha a tesztoldal már fut. A build hiányát vagy az idegen, foglalt portot egyértelműen jelzi.
 
+## Ha „recovery mode” jelenik meg
+
+A helyreállítási mód azt jelenti, hogy a környezet létrehozása valamelyik lépésnél megállt. Ilyenkor az npm- vagy szerverindító parancsokat még ne ebben a tartalékkonténerben futtasd; először a létrehozást kell helyreállítani.
+
+2026. október 22-én reprodukált és javított hiba: a Node 22-höz tartozó npm 10 hiányzó opcionális peer-függőségi bejegyzéseket talált a korábban npm 11-gyel mentett zárolófájlban. A `postCreateCommand` első, `npm ci` lépése emiatt `EUSAGE` hibával leállt. A javított `package-lock.json` ugyanazon a `review/inhouse-preview` ágon érhető el.
+
+A meglévő Codespace helyreállításához:
+
+1. A Codespaces **Terminal** paneljén, az `inhousemarketing` repository mappájában futtasd:
+
+   ```bash
+   git pull --ff-only origin review/inhouse-preview
+   ```
+
+2. Nyisd meg a parancspalettát: macOS-en **⌘⇧P**, Windows/Linux alatt **Ctrl+Shift+P**. Válaszd: **Codespaces: Rebuild Container**.
+3. Várd meg az újraépítést és a telepítési/build lépések végét. Utána **Ports → 3000 → Open in Browser**, továbbra is privát porttal.
+
+A frissítés és újraépítés nem igényli a Codespace törlését. A workspace-ben lévő `.env.local`, adatbázis és feltöltések megmaradnak. A `git pull --ff-only` helyi változások vagy eltérő ágtörténet esetén megáll; ilyenkor ne reseteld a munkádat, hanem ellenőrizd a hibaüzenetet.
+
+Ha a frissítés után is helyreállítási mód jelenik meg, a **View Creation Log** napló végén található az eredeti hibás parancs. A `/home/node` jogosultsági hibák megjelenhetnek már a tartalékkonténerben is, ezért önmagukban nem azonosítják a létrehozás eredeti hibáját. A napló utolsó sorai a terminálban is kiolvashatók:
+
+```bash
+tail -n 60 /workspaces/.codespaces/.persistedshare/creation.log
+```
+
 ## Saját adminfiók létrehozása
 
 1. A már megnyitott tesztoldal címének végére írd: **`/admin`**.

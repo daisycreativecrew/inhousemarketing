@@ -14,7 +14,7 @@ A mentett képeket GitHubon közvetlenül is megtekintheted: [asztali főoldal](
 
 ## Indítás
 
-Node.js 22.16+ (ellenőrizve: 24.19), npm és Chromium a böngészős tesztekhez.
+Node.js 22.16+ (ellenőrizve: 22.23.4 és 24.19), npm és Chromium a böngészős tesztekhez. A Codespaces Node 22/npm 10 környezetéhez is ellenőrzött zárolófájl tartozik. Helyreállítási mód esetén kövesd a [Codespaces-javítás lépéseit](docs/megnyitas.md#ha-recovery-mode-jelenik-meg).
 
 ```bash
 npm ci
